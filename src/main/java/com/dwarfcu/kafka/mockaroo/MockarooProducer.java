@@ -94,7 +94,7 @@ public class MockarooProducer {
               }
 
             } catch (AvroTypeException e) {
-              logger.warn("[Avro-SchemaRegistry] ", e);
+              logger.warn("[Avro-SchemaRegistry] " + json, e);
             } catch (IOException e) {
               logger.error(e);
             }
