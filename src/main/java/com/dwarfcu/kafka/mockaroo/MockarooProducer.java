@@ -3,6 +3,12 @@ package com.dwarfcu.kafka.mockaroo;
 import com.dwarfcu.kafka.Dataset;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.Decoder;
+import org.apache.avro.io.DecoderFactory;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -10,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
@@ -35,30 +41,37 @@ public class MockarooProducer {
       properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
       properties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, MockarooProducer.get("SCHEMA_REGISTRY_URL_CONFIG"));
 
-      KafkaProducer<String, Dataset> kafkaProducer = new KafkaProducer<>(properties);
+      KafkaProducer<String, GenericRecord> kafkaProducer = new KafkaProducer<>(properties);
 
       String topic = (String) MockarooProducer.get("TOPIC");
 
+      //Create schema
+      String avroSchema = MockarooProducer.readResourcesAsString("/avro/avro-schema.avsc");
+      logger.info("[Avro Schema]" + avroSchema);
+
+      Schema.Parser parser = new Schema.Parser();
+      Schema schema = parser.parse(avroSchema);
+
       while (true) {
         MockarooData mockarooData = new MockarooData();
-
-        String[] fields = ((String) mockarooData.get("mockaroo.fields")).split(",");
 
         for (Object o : mockarooData.getData()) {
           if (o instanceof JSONObject) {
             JSONObject json = (JSONObject) o;
 
-            Dataset.Builder builder = Dataset.newBuilder();
+            // Convert JSON to Avro according to Avro Schema
+            InputStream inputStreamJson = new ByteArrayInputStream(json.toString().getBytes());
+            DataInputStream dataInputStreamJson = new DataInputStream(inputStreamJson);
 
-            for (String field: fields) {
-              Method method = builder.getClass().getMethod("set" + capitalizeFirstLetter(field), String.class);
-              method.invoke(builder, json.get(field).toString());
-            }
+            Decoder decoder = DecoderFactory.get().jsonDecoder(schema, dataInputStreamJson);
 
-            Dataset dataset = builder.build();
+            DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
+            GenericRecord dataset = reader.read(null, decoder);
 
-            ProducerRecord<String, Dataset> producerRecord = new ProducerRecord<>(topic, dataset);
+            // Create Kafka record
+            ProducerRecord<String, GenericRecord> producerRecord = new ProducerRecord<>(topic, dataset);
 
+            // Send record to topic
             try {
               kafkaProducer.send(producerRecord, new Callback() {
                 @Override
@@ -85,7 +98,7 @@ public class MockarooProducer {
     } catch (IOException e) {
       logger.error("mockaroo.properties file does NOT exist!!!", e);
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error(e);
     }
     logger.info("[KAFKA] End.");
   }
@@ -99,5 +112,13 @@ public class MockarooProducer {
       return original;
     }
     return original.substring(0, 1).toUpperCase() + original.substring(1);
+  }
+
+  private static String readResourcesAsString (String filename) throws Exception {
+    InputStream inputStream = MockarooProducer.class.getResourceAsStream(filename);
+
+    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+    return org.apache.commons.io.IOUtils.toString(reader);
   }
 }
