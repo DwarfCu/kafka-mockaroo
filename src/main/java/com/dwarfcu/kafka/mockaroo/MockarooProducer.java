@@ -3,6 +3,8 @@ package com.dwarfcu.kafka.mockaroo;
 import com.dwarfcu.kafka.Dataset;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
+import org.apache.avro.AvroRuntimeException;
+import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
@@ -63,32 +65,39 @@ public class MockarooProducer {
             InputStream inputStreamJson = new ByteArrayInputStream(json.toString().getBytes());
             DataInputStream dataInputStreamJson = new DataInputStream(inputStreamJson);
 
-            Decoder decoder = DecoderFactory.get().jsonDecoder(schema, dataInputStreamJson);
-
-            DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
-            GenericRecord dataset = reader.read(null, decoder);
-
-            // Create Kafka record
-            ProducerRecord<String, GenericRecord> producerRecord = new ProducerRecord<>(topic, dataset);
-
-            // Send record to topic
             try {
-              kafkaProducer.send(producerRecord, new Callback() {
-                @Override
-                public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                  if (e == null) {
-                    logger.info("[KAFKA] Record " + json.toString() + " successfully submitted to: Partition " + recordMetadata.partition() + "; Offset: " + recordMetadata.offset());
-                  } else {
-                    logger.error("[KAFKA] The delivery has failed.", e);
+              Decoder decoder = DecoderFactory.get().jsonDecoder(schema, dataInputStreamJson);
+
+              DatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
+              GenericRecord dataset = reader.read(null, decoder);
+
+              // Create Kafka record
+              ProducerRecord<String, GenericRecord> producerRecord = new ProducerRecord<>(topic, dataset);
+
+              // Send record to topic
+              try {
+                kafkaProducer.send(producerRecord, new Callback() {
+                  @Override
+                  public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                    if (e == null) {
+                      logger.info("[KAFKA] Record " + json.toString() + " successfully submitted to: Partition " + recordMetadata.partition() + "; Offset: " + recordMetadata.offset());
+                    } else {
+                      logger.error("[KAFKA] The delivery has failed.", e);
+                    }
                   }
-                }
-              });
-            } catch (SerializationException e) {
-              logger.error("[KAFKA] Error serializing Avro message.", e);
+                });
+
+                kafkaProducer.flush();
+
+              } catch (SerializationException e) {
+                logger.error("[KAFKA] Error serializing Avro message.", e);
+              }
+
+            } catch (AvroTypeException e) {
+              logger.warn("[Avro-SchemaRegistry] ", e);
+            } catch (IOException e) {
+              logger.error(e);
             }
-
-            kafkaProducer.flush();
-
           }
         }
       }
@@ -105,13 +114,6 @@ public class MockarooProducer {
 
   private static Object get(String property) {
     return properties.get(property);
-  }
-
-  private static String capitalizeFirstLetter(String original) {
-    if (original == null || original.length() == 0) {
-      return original;
-    }
-    return original.substring(0, 1).toUpperCase() + original.substring(1);
   }
 
   private static String readResourcesAsString (String filename) throws Exception {
