@@ -112,13 +112,4 @@ Run docker containers.
 
        bash$ docker-compose up
 
-Edit ***resources/kafka.properties*** file from this project.
-````
-BOOTSTRAP_SERVERS_CONFIG=172.18.0.3:9092
-SCHEMA_REGISTRY_URL_CONFIG=http://172.18.0.4:8081
-CLIENT_ID_CONFIG=<your_client_id>
-TOPIC=<your_topic>
-````
-Run MockarooProducer class.
-
 [+INFO] [Confluent: Single Node Basic Deployment on Docker](https://docs.confluent.io/current/installation/docker/docs/installation/single-node-client.html)
