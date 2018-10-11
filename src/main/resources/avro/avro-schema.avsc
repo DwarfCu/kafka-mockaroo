@@ -5,7 +5,7 @@
      "version": "1",
      "fields": [
        { "name": "name", "type": "string", "doc": "First Name of customer" },
-       { "name": "amount", "type": "string", "doc": "Amount of money between [0..100]" },
+       { "name": "amount", "type": "float", "doc": "Amount of money between [0..100] with 2 decimals" },
        { "name": "date", "type": "string", "doc": "Date of transaction" },
        { "name": "time", "type": "string", "doc": "Time of transaction" }
      ]
