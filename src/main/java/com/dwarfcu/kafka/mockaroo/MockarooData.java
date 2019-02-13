@@ -19,6 +19,8 @@ public class MockarooData {
   private JSONArray dataset;
 
   public MockarooData() {
+    logger.info("[Mockaroo] Getting dataset...");
+
     try {
       properties = new Properties();
       properties.load(MockarooData.class.getClassLoader().getResource("mockaroo.properties").openStream());
@@ -26,6 +28,8 @@ public class MockarooData {
       URL url = new URL((String) this.get("mockaroo.url"));
 
       dataset = new JSONArray(IOUtils.toString(url, Charset.forName("UTF-8")));
+
+      logger.info("[Mockaroo] Dataset downloaded.");
     } catch (MalformedURLException e) {
       logger.error("mockaroo.url malformed!!!", e.getMessage());
     } catch (IOException e) {

@@ -60,6 +60,7 @@ public class MockarooProducer {
         for (Object o : mockarooData.getData()) {
           if (o instanceof JSONObject) {
             JSONObject json = (JSONObject) o;
+            logger.debug("[JSON] Input:" + json.toString());
 
             // Convert JSON to Avro according to Avro Schema
             InputStream inputStreamJson = new ByteArrayInputStream(json.toString().getBytes());
