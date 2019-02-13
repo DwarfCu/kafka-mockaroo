@@ -88,6 +88,30 @@
                 </configuration>
             </plugin>
 
+            <!-- Build an executable JAR -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.dwarfcu.kafka.mockaroo.MockarooProducer</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin> 
+
             <!--for specific record-->
             <plugin>
                 <groupId>org.apache.avro</groupId>

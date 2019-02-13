@@ -2,9 +2,9 @@
      "type": "record",
      "namespace": "com.dwarfcu.kafka",
      "name": "Dataset",
-     "version": "1",
+     "version": "2",
      "fields": [
-       { "name": "title", "type": ["null", "string"], "default": null, "doc": "Title of the track." },
+       { "name": "title", "type": "string", "doc": "Title of the track." },
        { "name": "user_id", "type": "int", "doc": "User ID." },
        { "name": "kms", "type": "float", "doc": "Distance of the track (kms)." },
        { "name": "elevation", "type": "float", "doc": "Elevation+ of the track (meters)." },
