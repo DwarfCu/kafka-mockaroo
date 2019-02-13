@@ -4,12 +4,9 @@
      "name": "Dataset",
      "version": "1",
      "fields": [
-       { "name": "title", "type": ["null", "string"], "default": null, "doc": "Title of the track." },
-       { "name": "user_id", "type": "int", "doc": "User ID." },
-       { "name": "kms", "type": "float", "doc": "Distance of the track (kms)." },
-       { "name": "elevation", "type": "float", "doc": "Elevation+ of the track (meters)." },
-       { "name": "circular", "type": "boolean", "doc": "Does the track start and end in the same point?" },
-       { "name": "type", "type": "string", "doc": "Type of bike." },
-       { "name": "participants_id", "type": { "type": "array", "items": "int" }, "doc": "Other participants (User IDs)." }
+       { "name": "name", "type": "string", "doc": "First Name of customer" },
+       { "name": "amount", "type": "float", "doc": "Amount of money between [0..100] with 2 decimals" },
+       { "name": "date", "type": "string", "doc": "Date of transaction" },
+       { "name": "time", "type": "string", "doc": "Time of transaction" }
      ]
 }
