@@ -29,7 +29,7 @@ public class MockarooProducer {
   private static Properties properties;
 
   public static void main(String[] args) {
-
+    
     logger.info("[KAFKA] Starting...");
 
     properties = new Properties();
@@ -42,6 +42,8 @@ public class MockarooProducer {
       properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
       properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
       properties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, MockarooProducer.get("SCHEMA_REGISTRY_URL_CONFIG"));
+
+      logger.debug("[kafka.properties] " + properties.toString());
 
       KafkaProducer<String, GenericRecord> kafkaProducer = new KafkaProducer<>(properties);
 
