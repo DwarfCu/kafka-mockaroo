@@ -43,7 +43,7 @@ public class MockarooProducer {
       properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
       properties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, MockarooProducer.get("SCHEMA_REGISTRY_URL_CONFIG"));
 
-      logger.debug("[kafka.properties]:" + properties.toString());
+      logger.debug("[kafka.properties]:" + getPropertyAsString(properties));
 
       KafkaProducer<String, GenericRecord> kafkaProducer = new KafkaProducer<>(properties);
 
@@ -125,5 +125,11 @@ public class MockarooProducer {
     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
     return org.apache.commons.io.IOUtils.toString(reader);
+  }
+
+  private static String getPropertyAsString(Properties prop) {    
+    StringWriter writer = new StringWriter();
+    prop.list(new PrintWriter(writer));
+    return writer.getBuffer().toString();
   }
 }
