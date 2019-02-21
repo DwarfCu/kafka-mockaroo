@@ -14,6 +14,7 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -100,7 +101,7 @@ public class MockarooProducer {
             } catch (AvroTypeException e) {
               logger.warn("[Avro-SchemaRegistry] " + json, e);
             } catch (IOException e) {
-              logger.error(e);
+              logger.error("Message: " + e.getLocalizedMessage() + "; Cause: " + e.getCause());
             }
           }
         }
@@ -111,7 +112,7 @@ public class MockarooProducer {
     } catch (IOException e) {
       logger.error("mockaroo.properties file does NOT exist!!!", e);
     } catch (Exception e) {
-      logger.error(e);
+      logger.error("Message: " + e.getLocalizedMessage() + "; Cause: " + e.getCause());
     }
     logger.info("[KAFKA] End.");
   }
