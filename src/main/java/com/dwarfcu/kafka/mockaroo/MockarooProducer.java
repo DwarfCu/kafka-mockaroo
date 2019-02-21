@@ -43,7 +43,8 @@ public class MockarooProducer {
       properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
       properties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, MockarooProducer.get("SCHEMA_REGISTRY_URL_CONFIG"));
 
-      logger.debug("[kafka.properties]:" + getPropertyAsString(properties));
+      logger.debug("[kafka.properties]:" + MockarooProducer.get("BOOTSTRAP_SERVERS_CONFIG") + "#" + MockarooProducer.get("SCHEMA_REGISTRY_URL_CONFIG"));
+      logger.info("hola");
 
       KafkaProducer<String, GenericRecord> kafkaProducer = new KafkaProducer<>(properties);
 
