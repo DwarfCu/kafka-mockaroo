@@ -127,10 +127,4 @@ public class MockarooProducer {
 
     return org.apache.commons.io.IOUtils.toString(reader);
   }
-
-  private static String getPropertyAsString(Properties prop) {    
-    StringWriter writer = new StringWriter();
-    prop.list(new PrintWriter(writer));
-    return writer.getBuffer().toString();
-  }
 }
