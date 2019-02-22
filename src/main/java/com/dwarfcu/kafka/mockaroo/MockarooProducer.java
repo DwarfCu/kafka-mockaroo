@@ -14,6 +14,7 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -29,7 +30,7 @@ public class MockarooProducer {
   private static Properties properties;
 
   public static void main(String[] args) {
-
+    
     logger.info("[KAFKA] Starting...");
 
     properties = new Properties();
@@ -42,6 +43,8 @@ public class MockarooProducer {
       properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
       properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
       properties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, MockarooProducer.get("SCHEMA_REGISTRY_URL_CONFIG"));
+
+      logger.debug("[kafka.properties]:" + MockarooProducer.get("BOOTSTRAP_SERVERS_CONFIG") + "#" + MockarooProducer.get("SCHEMA_REGISTRY_URL_CONFIG"));
 
       KafkaProducer<String, GenericRecord> kafkaProducer = new KafkaProducer<>(properties);
 
@@ -97,7 +100,7 @@ public class MockarooProducer {
             } catch (AvroTypeException e) {
               logger.warn("[Avro-SchemaRegistry] " + json, e);
             } catch (IOException e) {
-              logger.error(e);
+              logger.error("Message: " + e.getLocalizedMessage() + "; Cause: " + e.getCause());
             }
           }
         }
@@ -108,7 +111,7 @@ public class MockarooProducer {
     } catch (IOException e) {
       logger.error("mockaroo.properties file does NOT exist!!!", e);
     } catch (Exception e) {
-      logger.error(e);
+      logger.error("Message: " + e.getLocalizedMessage() + "; Cause: " + e.getCause());
     }
     logger.info("[KAFKA] End.");
   }
