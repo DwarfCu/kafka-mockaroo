@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import java.util.Properties;
 
-public class MockarooDataCSVTests {
+public class MockarooDataTests {
 
   @Test
   public void getCSVDataset() {
