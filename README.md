@@ -14,6 +14,7 @@ Events are checked against an schema thanks to **Confluent Schema Registry** ser
 
 2. Setup ***resources/mockaroo.properties***. For example:
   
+       mockaroo.format=json
        mockaroo.url=https://api.mockaroo.com/api/9b0d87e0?count=1000&key=<your_key>
 
 3. Create the right AVRO Schema ***resources/avro/avro-schema.avsc***. Please, edit only the *fields* section. For BankBalanceDataset example:
