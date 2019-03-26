@@ -1,4 +1,4 @@
-package com.dwarfcu.kafka.mockaroo;
+package com.dwarfcu.mockaroo;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -16,7 +16,8 @@ public class MockarooData {
   private static final Logger logger = LogManager.getLogger(MockarooData.class.getName());
 
   private static Properties properties;
-  private JSONArray dataset;
+  private JSONArray datasetJson;
+  private String[] datasetString;
 
   public MockarooData() {
     logger.info("[Mockaroo] Getting dataset...");
@@ -25,9 +26,18 @@ public class MockarooData {
       properties = new Properties();
       properties.load(MockarooData.class.getClassLoader().getResource("mockaroo.properties").openStream());
 
-      URL url = new URL((String) this.get("mockaroo.url"));
+      URL url = new URL((String) MockarooData.get("mockaroo.url"));
 
-      dataset = new JSONArray(IOUtils.toString(url, Charset.forName("UTF-8")));
+      String format = (String) MockarooData.get("mockaroo.format");
+
+      if (format.toLowerCase().equals("json")) {
+        datasetJson = new JSONArray(IOUtils.toString(url, Charset.forName("UTF-8")));
+      } else if (format.toLowerCase().equals("csv")) {
+        datasetString = IOUtils.toString(url, Charset.forName("UTF-8")).split("\n");
+      } else {
+        logger.error("[Mockaroo] Unknow format: " + format + ". Please, check mockaroo.properties.");
+        System.exit(0);
+      }
 
       logger.info("[Mockaroo] Dataset downloaded.");
     } catch (MalformedURLException e) {
@@ -37,11 +47,15 @@ public class MockarooData {
     }
   }
 
-  public Object get(String property) {
+  private static Object get(String property) {
     return properties.get(property);
   }
 
-  public JSONArray getData() {
-    return dataset;
+  public JSONArray getDataJson() {
+    return datasetJson;
+  }
+
+  public String[] getDataString() {
+    return datasetString;
   }
 }

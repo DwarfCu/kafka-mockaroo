@@ -1,6 +1,7 @@
-package com.dwarfcu.kafka.mockaroo;
+package com.dwarfcu.kafka;
 
 import com.dwarfcu.kafka.Dataset;
+import com.dwarfcu.mockaroo.MockarooData;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.avro.AvroRuntimeException;
@@ -30,7 +31,7 @@ public class MockarooProducer {
   private static Properties properties;
 
   public static void main(String[] args) {
-    
+
     logger.info("[KAFKA] Starting...");
 
     properties = new Properties();
@@ -60,7 +61,7 @@ public class MockarooProducer {
       while (true) {
         MockarooData mockarooData = new MockarooData();
 
-        for (Object o : mockarooData.getData()) {
+        for (Object o : mockarooData.getDataJson()) {
           if (o instanceof JSONObject) {
             JSONObject json = (JSONObject) o;
             logger.debug("[JSON] Input:" + json.toString());
