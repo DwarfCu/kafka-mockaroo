@@ -25,7 +25,26 @@ public class MockarooData {
     try {
       properties = new Properties();
       properties.load(MockarooData.class.getClassLoader().getResource("mockaroo.properties").openStream());
+    } catch (IOException e) {
+      logger.error("mockaroo.properties file does NOT exist!!!", e.getMessage());
+    }
 
+    downloadMockarooData();
+  }
+
+  public MockarooData(Properties properties) {
+    if (properties.containsKey("mockaroo.format") && (properties.containsKey("mockaroo.url"))){
+      this.properties = properties;
+
+      downloadMockarooData();
+    } else {
+      logger.error("[Mockaroo] Some properties (mockaroo.format or mockaroo.url) are missing.");
+      System.exit(0);
+    }
+  }
+
+  private void downloadMockarooData() {
+    try {
       URL url = new URL((String) MockarooData.get("mockaroo.url"));
 
       String format = (String) MockarooData.get("mockaroo.format");
@@ -43,9 +62,10 @@ public class MockarooData {
     } catch (MalformedURLException e) {
       logger.error("mockaroo.url malformed!!!", e.getMessage());
     } catch (IOException e) {
-      logger.error("mockaroo.properties file does NOT exist!!!", e.getMessage());
+      logger.error(e.getMessage());
     }
   }
+
 
   private static Object get(String property) {
     return properties.get(property);
